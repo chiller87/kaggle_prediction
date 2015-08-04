@@ -38,7 +38,9 @@ fm_prediction <- function(data, data.test, some.params) {
         # regulation (only affect ALS and SGD)
         reg=0,
         # learning rate (only affect SGD)
-        lr=0.001
+        lr=0.001,
+        # data representation
+        data.rep=NA
     )
     
     # override default params with those, that are specified in some.params
