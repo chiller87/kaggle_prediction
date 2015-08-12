@@ -3,10 +3,7 @@
 
 prepare_data <- function(data, column.name.range, data.representation) {
     
-    if("clean" %in% data.representation)
-    {
-        data <- remove_unimportant_columns(data)
-    }
+    
     
     if("indicators" %in% data.representation)
     {
@@ -28,6 +25,11 @@ prepare_data <- function(data, column.name.range, data.representation) {
         data <- replace_with_mean(data, column.name.range = column.name.range)
     }
     
+    if("clean" %in% data.representation)
+    {
+        data <- remove_unimportant_columns(data)
+    }
+    
     
     
     return(data)
@@ -35,10 +37,17 @@ prepare_data <- function(data, column.name.range, data.representation) {
 
 
 remove_unimportant_columns <- function(data) {
-    # remove columns with negative feature importance
-    unimportant.columns <- c("T1_V10", "T1_V13", "T1_V14", "T2_V1", "T2_V2", "T2_V9", "T2_V10")
-    print(paste("removing unimportant columns: ", unimportant.columns, sep=""))
-    data <- data[,!(names(data) %in% unimportant.columns)]
+    # columns to remove
+    #unimportant.columns <- c("T1_V10", "T1_V11", "T2_V10", "T2_V11", "T2_V12")
+    #print(paste("removing unimportant columns: ", unimportant.columns, sep=""))
+    
+    print(paste("removing unimportant columns: ", features.to.be.cleaned, sep=""))
+    
+    #data <- data[,!(names(data) %in% unimportant.columns)]
+    
+    for(column in features.to.be.cleaned) {
+        data <- drop_columns_beginning_with(data, column)
+    }
     
     return(data)
 }
@@ -236,46 +245,11 @@ replace_with_set_indicators <- function(data, column.name.range) {
 
 
 
-### Creates a set of new columns for your data set that summarize factor levels by descriptive statistics such as mean,
-### sd, skewness etc.
 
-### Variables : train = training set
-###             test = test set
-###             response = response variable (Hazard in this competition)
-###             variables = vector of column names you wise to summarize (T1_V4 for example). Must be strings.
-###             metrics = vector of desctriptive statistics you wish to compute for each factor level. Must Be Strings.
 
-### ex: factorToNumeric(train, test, "Hazard", "T1_V4", "mean") will return a column of hazard means by factor level
-###     in column T1_V4
-
-### You can specify the test parameter as train to get a column to add to your training set
-
-###### REQUIRES package qdapTools  #####
-library(qdapTools)
-replace_with_mean <- function(data, column.name.range) {
-
-   
-    train <- read.csv("../data/train.csv")
-    test <- read.csv("../data/test.csv")
-    
-    columns.to.add <- factorToNumeric(train, data, "Hazard", column.name.range, c("mean"))
-    data <- data[,!(names(data) %in% column.name.range)]
-    data <- cbind(data, columns.to.add)
-    
-}
-
-factorToNumeric <- function(train, test, response, variables, metrics){
-    temp <- data.frame(c(rep(0,nrow(test))), row.names = NULL)
-    
-    for (variable in variables){
-        for (metric in metrics) {
-            x <- tapply(train[, response], train[,variable], metric)
-            x <- data.frame(row.names(x),x, row.names = NULL)
-            temp <- data.frame(temp,round(lookup(test[,variable], x),2))
-            colnames(temp)[ncol(temp)] <- paste(metric,variable, sep = "_")
-        }
-    }
-    return (temp[,-1])
+drop_columns_beginning_with <- function(data, column.prefix) {
+    data.modified <- data[, !(grepl(column.prefix, names(data)))]
+    return(data.modified)
 }
 
 

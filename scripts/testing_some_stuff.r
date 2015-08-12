@@ -5,7 +5,7 @@ non.numeric.columns <- c("T1_V4", "T1_V5", "T1_V6", "T1_V7", "T1_V8", "T1_V9",
                          "T1_V11", "T1_V12", "T1_V15", "T1_V16", "T1_V17", "T2_V3", 
                          "T2_V5", "T2_V11", "T2_V12", "T2_V13")
 all.columns <- names(data)
-numeric.columns <- all[!(all.columns %in% non.numeric.columns)]
+numeric.columns <- all.columns[!(all.columns %in% non.numeric.columns)]
 
 
 column.name <- "T1_V4"
@@ -75,6 +75,8 @@ colnames(different.elements.matrix) <- c(paste(column, "_train", sep=""), paste(
 
 
 
+
+combinations <- combn(all.columns, 20, simplify = FALSE)
 
 
 

@@ -13,6 +13,10 @@ source("compute_score.r")
 
 data.representation <- c("indicators") # c("ids", "indicators", "setindicators", "clean")
 
+# only relevant, if "clean" is in data.representation
+features.to.be.cleaned <- c("T1_V11") #c("T1_V10", "T1_V11", "T2_V10", "T2_V11", "T2_V12")
+
+
 # reading data:
 # id hazard T1_V1-T1_V17 T2_V1-T2_V15
 # => 34 columns!
@@ -20,7 +24,7 @@ print("preparing data ...")
 raw_data <- read.table("../data/train.csv", sep = ",", header = TRUE)
 #print("done!")
 
-
+# columns to be turned into numeric columns
 non.numeric.columns <- c("T1_V4", "T1_V5", "T1_V6", "T1_V7", "T1_V8", "T1_V9", 
                          "T1_V11", "T1_V12", "T1_V15", "T1_V16", "T1_V17", "T2_V3", 
                          "T2_V5", "T2_V11", "T2_V12", "T2_V13")
@@ -40,9 +44,9 @@ test.data <- NA
 
 
 # initialize ranges (FM training)
-fm.method.range <- c("mcmc")
-k.range <- c(8) #seq(8, 12, 1)#c(8, 12, 16) 
-stdev.range <- c(0.0)# seq(0.02, 0.1, 0.02)#c(0.0) 
+fm.method.range <- c("mcmc") 
+k.range <- c(0) #seq(8, 12, 1)#c(8, 12, 16) 
+stdev.range <- c(0) #seq(0.0, 0.1, 0.05)#c(0.0) 
 iter.range <- c(400) #seq(200, 2000, 200) #seq(400, 1600, 200) 
 reg.range <-  c(0)#seq(0, 2, 1)
 lr.range <- c(0.0) 
@@ -68,7 +72,6 @@ for (iter in iter.range) {
 
 
 # clean up
-print("cleaning up ...")
 unlink("tmp/*.libfm")
 
 
