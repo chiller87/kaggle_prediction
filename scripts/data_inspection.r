@@ -18,7 +18,7 @@ numeric.columns <- numeric.columns[3:length(numeric.columns)]
 target <- data.train[["Hazard"]]
 
 
-what <- c("frequency") # c("correlation", "ranges", "frequency")
+what <- c("sd") # c("correlation", "ranges", "frequency")
 
 
 
@@ -123,4 +123,92 @@ if("ranges" %in% what) {
     write.table(column.ranges.matrix, file = paste("tmp/column_ranges.csv", sep=""), 
                 sep = ";", row.names = FALSE, append = FALSE, col.names = TRUE, na = "")
 }
+
+
+
+
+
+
+if("density" %in% what) {
+    
+    
+    #data.train <- replace_with_ids(data.train, column.name.range = non.numeric.columns)
+    
+    column.range <- colnames(data.train)
+    column.range <- gsub("_ids", "_cat", column.range)
+    
+    colnames(data.train) <- column.range
+    
+    #column.range <- c("T1_V1", "T1_V4")
+    
+    for(column in column.range) {
+        print(paste("curr column: ", column, sep = ""))
+        
+        if(column == "Id") {
+            next
+        }
+        
+        if(column == "Hazard") {
+            values.train <- data.train[[column]]
+            table.train <- prop.table(table(values.train))
+            
+            value.max <- max (table.train)
+            value.max <- ceiling(value.max*10)/10
+            
+            pdf(paste("tmp/density_", column, ".pdf", sep=""))
+            par(cex=1.7)
+            barplot(table.train, main=column, ylab="Density", xlab="values",
+                    col=c("lightblue"), beside=TRUE, legend=c("train data"),
+                    args.legend=list(x="top", bty="n", inset=c(0, -0.12), horiz=TRUE))
+            dev.off()
+            next
+        }
+        
+        ind <- seq(1,10,1)
+        
+        values.train <- sort(data.train[[column]])
+        table.train <- prop.table(table(values.train))
+        values.test <- sort(data.test[[column]])
+        table.test <- prop.table(table(values.test))
+        table.combined <- rbind(table.train, table.test)
+        
+        value.max <- max(table.combined)
+        value.max <- ceiling(value.max*10)/10
+
+        pdf(paste("tmp/density_", column, ".pdf", sep=""))
+        par(cex=1.7)
+        barplot(table.combined, main=column, ylab="Density", xlab="values", 
+                col=c("lightblue", "red"), beside=TRUE, legend=c("train data", "test data"),
+                args.legend=list(x="top", bty="n", inset=c(0, -0.12), horiz=TRUE))
+        dev.off()
+
+    }
+
+}
+
+
+
+
+if("sd" %in% what) {
+    hazard.mean <- mean(target)
+    hazard.var <- var(target)
+    hazard.sd <- sd(target)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

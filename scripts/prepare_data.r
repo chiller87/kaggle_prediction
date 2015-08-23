@@ -10,6 +10,13 @@ prepare_data <- function(data, column.name.range, data.representation) {
         data <- replace_with_indicators(data, column.name.range = column.name.range)
     }
     
+    if("indicators_all" %in% data.representation)
+    {
+        all.columns <- names(data)
+        feature.columns <- all.columns[!(all.columns %in% c("Id", "Hazard"))]
+        data <- replace_with_indicators(data, column.name.range = feature.columns)
+    }
+    
     if("setindicators" %in% data.representation)
     {
         data <- replace_with_set_indicators(data, column.name.range = column.name.range)
@@ -107,7 +114,13 @@ replace_with_indicators <- function(data, column.name.range) {
 
         print("adding indicators to data table ... ")
         # join data and indicator.data
-        data <- cbind(data[,1:idx, drop=F], indicator.data, data[,(idx+1):length(data), drop=F])
+        if(idx == ncol(data)) {
+            # if features s last column
+            data <- cbind(data[,1:idx, drop=F], indicator.data)
+        }
+        else {
+            data <- cbind(data[,1:idx, drop=F], indicator.data, data[,(idx+1):length(data), drop=F])
+        }
         # remember column.name to drop later
         columns.to.drop <- c(columns.to.drop, column.name)
         

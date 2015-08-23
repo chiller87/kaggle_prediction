@@ -66,3 +66,58 @@ build_paramstr <- function(params) {
 }
 
 
+
+
+
+
+
+
+
+
+save_boost_result <- function(result) {
+    
+    res = result$hazard
+    params = result$params
+    submission = result$submission
+    solution = result$solution
+    
+    ae <- abs( res$predicted - res$true )
+    re <- ae/res$true
+    
+    mae <- mean(ae)
+    medae <- median(ae)
+    mre <- mean(re)
+    medre <- median(re)
+    
+    if(!identical(solution, NA))
+    {
+        gini <- NormalizedGini(solution[,2], submission[,2])
+    }
+    else 
+    {
+        gini <- NA
+    }
+    
+    params$data.rep <- paste(params$data.rep, collapse=" ")
+    data_f <- list(params, test=result$test, mae=mae, medae=medae, mre=mre, medre=medre, gini=gini)
+    print_result(data_f)
+    print("save data to csv ...")
+    write.table(data_f,file="results_boost.csv", sep=";", append=TRUE, col.names=FALSE, row.names=FALSE)
+    
+    print("save submission ...")
+    write.table(result$submission, file="submission_boost.csv", sep=",", append=FALSE, col.names=TRUE, row.names=FALSE)
+    
+    return(data.frame(data_f))
+}
+
+
+
+
+
+
+
+
+
+
+
+

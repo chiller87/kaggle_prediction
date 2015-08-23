@@ -11,7 +11,7 @@ source("compute_score.r")
 #source("data_inspection.r")
 # ===================================================================================
 
-data.representation <- c("indicators") # c("ids", "indicators", "setindicators", "clean")
+data.representation <- c("indicators_all") # c("ids", "indicators", "setindicators", "clean")
 
 # only relevant, if "clean" is in data.representation
 features.to.be.cleaned <- c("T1_V11") #c("T1_V10", "T1_V11", "T2_V10", "T2_V11", "T2_V12")
@@ -28,6 +28,9 @@ raw_data <- read.table("../data/train.csv", sep = ",", header = TRUE)
 non.numeric.columns <- c("T1_V4", "T1_V5", "T1_V6", "T1_V7", "T1_V8", "T1_V9", 
                          "T1_V11", "T1_V12", "T1_V15", "T1_V16", "T1_V17", "T2_V3", 
                          "T2_V5", "T2_V11", "T2_V12", "T2_V13")
+all.columns <- names(raw_data)
+numeric.columns <- all.columns[!(all.columns %in% non.numeric.columns)]
+feature.columns <- all.columns[!(all.columns %in% c("Id", "Hazard"))]
 
 
 #print("extracting values for non numeric columns ...")
@@ -37,15 +40,15 @@ write.table(data, file = "tmp/prepared_data.csv", sep = ",", row.names = FALSE, 
 
 print("preparing test data ...")
 test.data <- NA
-#test.raw_data <- read.table("../data/test.csv", sep = ",", header = TRUE)
-#test.data <- prepare_data(data = test.raw_data, column.name.range = non.numeric.columns, data.representation=data.representation)
+test.raw_data <- read.table("../data/test.csv", sep = ",", header = TRUE)
+test.data <- prepare_data(data = test.raw_data, column.name.range = non.numeric.columns, data.representation=data.representation)
 #write.table(test.data, file = "tmp/testdata_with_indicators.csv", sep = ",", row.names = FALSE, col.names = TRUE, append = FALSE)
 #print("done!")
 
 
 # initialize ranges (FM training)
 fm.method.range <- c("mcmc") 
-k.range <- c(0) #seq(8, 12, 1)#c(8, 12, 16) 
+k.range <- c(10) #seq(8, 12, 1)#c(8, 12, 16) 
 stdev.range <- c(0) #seq(0.0, 0.1, 0.05)#c(0.0) 
 iter.range <- c(400) #seq(200, 2000, 200) #seq(400, 1600, 200) 
 reg.range <-  c(0)#seq(0, 2, 1)
